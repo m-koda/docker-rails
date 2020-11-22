@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/myapp
+    ## 以下の2つでdocker run時の-itオプションの代わり
+    #tty: true
+    #stdin_open: true
+    ## /tmp/pids/server.pid対策
+    command: /bin/sh -c "rm -f tmp/pids/server.pid && rails s -p 3000 -b '0.0.0.0'"
+    depends_on:
+      - db
+    environment: 
+      - "DATABASE_PASSWORD=postgres" # ちょっと手抜き..
+
+  db:
+    image: postgres # ちょっと手抜き..
+    volumes: 
+      - db-data:/var/lib/postgresql/data
+    environment: 
+      - "POSTGRES_PASSWORD=postgres"
+
+volumes:
+  db-data:
